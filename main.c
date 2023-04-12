@@ -67,6 +67,8 @@ void postfix(char* equations, int l) {
             int opr = 0;
             if (equations[j] == '+') opr = -1;
             else if (equations[j] == '-') opr = -2;
+            else if (equations[j] == '*') opr = -4;
+            else if (equations[j] == '/') opr = -5;
             else if (equations[j] == '(') opr = -13;
             else if (equations[j] == ')') { // Right parenthesis has special behavior.
                 opr = -14;
@@ -111,6 +113,12 @@ void calculate() {
                 case -2:
                     calPush(b - a);
                     break;
+                case -4:
+                    calPush(b * a);
+                    break;
+                case -5:
+                    calPush(b / a);
+                    break;
             }
         }
     }
@@ -126,7 +134,7 @@ int main() {
     // int "i" is just a reusable variable.
     char equations[LT];
     char *equation_pos = &equations[0];
-    int equations_length[LT];
+    int equations_length[LT/3];
     int length = 0, T = 0, i = 0;
 
     // Entering equations
@@ -155,7 +163,7 @@ int main() {
         printf("\n");
         i++;
 
-        printf("Postfix of equation %d : ", i+1);
+        printf("Postfix of equation %d : ", i);
         printQueue();
         printf("The answer is : ");
         calculate();
@@ -204,6 +212,12 @@ void printQueue(void) {
                     break;
                 case -2:
                     printf("- ");
+                    break;
+                case -4:
+                    printf("* ");
+                    break;
+                case -5:
+                    printf("/ ");
                     break;
             }
         }
