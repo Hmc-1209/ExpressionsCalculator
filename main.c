@@ -4,7 +4,7 @@
 
 #define LT 1000000 // Maximum chars available.
 
-// Stack for temporary storing operators when converting equation to postfix.
+// Stack for temporary storing operators when converting expression to postfix.
 typedef struct Operators {
     int values[LT];
     int top;
@@ -54,37 +54,39 @@ Calculate ca;
 int inRange(char c) {
     int e = (int) c;
     if ((e >= 48 && e <= 57) || (c == '+') || (c == '-') || (c == '*') || (c == '/') || (c == '^') || (c == '%') ||
-        (c == '(') || (c == ')')) return 1;
+        (c == '(') || (c == ')'))
+        return 1;
     return 0;
 }
 
 
-// Converting equation to postfix.
-void postfix(char *equations, int l) {
+// Converting expression to postfix.
+
+void postfix(char *expressions, int l) {
 
     int num = -1;
     for (int j = 0; j < l; j++) {
         // If the element is digit, save it in the int "num".
-        if (isdigit(equations[j])) {
+        if (isdigit(expressions[j])) {
             if (num == -1) { // If this is the first num :
-                num = (int) equations[j] - 48;
+                num = (int) expressions[j] - 48;
             } else {  // If this is not the first num :
-                num = num * 10 + ((int) equations[j] - 48);
+                num = num * 10 + ((int) expressions[j] - 48);
             }
-        } else if (inRange(equations[j])) {
+        } else if (inRange(expressions[j])) {
             if (num != -1) queue(num); // Queuing the number into the queue.
             num = -1; // Reset num.
             // Checking the level of the operator.
             // [+, -, (] -> [-1, -2, -13]
             int opr = 0;
-            if (equations[j] == '+') opr = -1;
-            else if (equations[j] == '-') opr = -2;
-            else if (equations[j] == '*') opr = -4;
-            else if (equations[j] == '/') opr = -5;
-            else if (equations[j] == '%') opr = -6;
-            else if (equations[j] == '^') opr = -7;
-            else if (equations[j] == '(') opr = -13;
-            else if (equations[j] == ')') { // Right parenthesis has special behavior.
+            if (expressions[j] == '+') opr = -1;
+            else if (expressions[j] == '-') opr = -2;
+            else if (expressions[j] == '*') opr = -4;
+            else if (expressions[j] == '/') opr = -5;
+            else if (expressions[j] == '%') opr = -6;
+            else if (expressions[j] == '^') opr = -7;
+            else if (expressions[j] == '(') opr = -13;
+            else if (expressions[j] == ')') { // Right parenthesis has special behavior.
                 opr = -14;
                 while (op.values[op.top] != -13) {
                     queue(op.values[op.top]);
@@ -103,7 +105,7 @@ void postfix(char *equations, int l) {
             }
         }
     }
-    if (equations[l - 1] != ')') queue(num); // Queuing the last number if exists.
+    if (expressions[l - 1] != ')') queue(num); // Queuing the last number if exists.
     while (op.top != -1) {
         queue(op.values[op.top]);
         popOperator();
@@ -145,41 +147,40 @@ void calculate() {
     printf("%.13f", calTop() / 1.0);
 }
 
-
-// Checking if the equation is legal.
-int exception_handling(char *equations, int l) {
+// Checking if the expression is legal.
+int exception_handling(char *expressions, int l) {
     int parentheses = 0;
     for (int i = 0; i < l; i++) {
-        if (equations[i] == '(') parentheses++;
-        else if (equations[i] == ')') {
+        if (expressions[i] == '(') parentheses++;
+        else if (expressions[i] == ')') {
             if (parentheses >= 0) parentheses--;
             else return 1;
-        }
+        } else if (expressions[i] == '/' && expressions[i + 1] == '0') return 2;
     }
-    if (parentheses != 0) return 1;
-    return 0;
+//    if (parentheses != 0) return 1;
+    return (parentheses != 0) ? 1 : 0;
 }
 
 
 int main() {
 
-    // Array equations for storing all chars.
-    // Pointer equation_pos for sending the position of the start pos of current equation.
-    // Array equations_length for saving numbers of chars in single equation.
+    // Array expressions for storing all chars.
+    // Pointer expression_pos for sending the position of the start pos of current expression.
+    // Array expressions_length for saving numbers of chars in single expression.
     // int "i" is just a reusable variable.
-    char equations[LT];
-    char *equation_pos = &equations[0];
-    int equations_length[LT / 3];
+    char expressions[LT];
+    char *expression_pos = &expressions[0];
+    int expressions_length[LT / 3];
     int length = 0, T = 0, i = 0;
 
-    // Entering equations
-    while (scanf("%c", &equations[i]) != ' ') {
-        if (equations[i] == ' ') { // When entering space and return the line, end the input.
-            equations_length[T++] = length;
+    // Entering expressions
+    while (scanf("%c", &expressions[i]) != ' ') {
+        if (expressions[i] == ' ') { // When entering space and return the line, end the input.
+            expressions_length[T++] = length;
             break;
         }
-        if (equations[i] == '\n') { // When entering return, save the current equation detail.
-            equations_length[T++] = length;
+        if (expressions[i] == '\n') { // When entering return, save the current expression detail.
+            expressions_length[T++] = length;
             length = 0;
         } else length++;
         i++;
@@ -187,21 +188,29 @@ int main() {
 
     // --------------------- Calculating ---------------------
     i = 0;
-    while (equations_length[i] != '\0') {
+    while (expressions_length[i] != '\0') {
         op.top = -1;    // Resetting the operators stack.
         q.front = 0;    // Resetting the queue.
         q.rear = -1;
         ca.top = -1;    // Resetting the calculator stack.
 
-        // If the equation is legal, do postfix and calculate.
-        if (exception_handling(equation_pos, equations_length[i]) != 1) {
-            postfix(equation_pos, equations_length[i]);
-//            printQueue();
-            calculate();
-            // Else, told the user this equation has some problem.
-        } else printf("The equation has unbalanced parentheses.");
+        // If the expression is illegal, told the user this expression has some problem.
+        switch (exception_handling(expression_pos, expressions_length[i])) {
+            case 1:
+                printf("The expression has unbalanced parentheses.");
+                break;
+            case 2:
+                printf("The expression can't divide a number by zero.");
+                break;
+            // Else, do postfix and calculate the answer.
+            default:
+                postfix(expression_pos, expressions_length[i]);
+                calculate();
+                break;
+        }
 
-        equation_pos += equations_length[i] + 1; // Plus one for '\n' operator.
+        // Move the pointer to the start of the next expression.
+        expression_pos += expressions_length[i] + 1; // Plus one for '\n' operator.
         printf("\n");
 
         i++;
