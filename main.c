@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<ctype.h>
+#include<math.h>
 
 #define LT 1000000 // Maximum chars available.
 
@@ -21,23 +22,25 @@ typedef struct Calculate {
 } Calculate;
 
 
-/*  Just some testing data :
- *  (1+3)-(9-5)
- *  3+4-1+9-(100-45)-5123+(10-1024)
- *  (9999-9988)-(100-4)+91-3+4-1-1-1+(312-1968)
- *  */
-
-
 // Defining functions of stacks and queue.
 void pushOperator(int operator);
+
 void popOperator(void);
+
 void printOperator(void);
+
 int topOperator(void);
+
 void queue(int element);
+
 void printQueue(void);
+
 void calPush(double num);
+
 void calPop(void);
+
 double calTop(void);
+
 void calPrint(void);
 
 
@@ -47,8 +50,17 @@ Queue q;
 Calculate ca;
 
 
+// Check if the char is number or operator.
+int inRange(char c) {
+    int e = (int) c;
+    if ((e >= 48 && e <= 57) || (c == '+') || (c == '-') || (c == '*') || (c == '/') || (c == '^') || (c == '%') ||
+        (c == '(') || (c == ')')) return 1;
+    return 0;
+}
+
+
 // Converting equation to postfix.
-void postfix(char* equations, int l) {
+void postfix(char *equations, int l) {
 
     int num = -1;
     for (int j = 0; j < l; j++) {
@@ -59,7 +71,7 @@ void postfix(char* equations, int l) {
             } else {  // If this is not the first num :
                 num = num * 10 + ((int) equations[j] - 48);
             }
-        } else {
+        } else if (inRange(equations[j])) {
             if (num != -1) queue(num); // Queuing the number into the queue.
             num = -1; // Reset num.
             // Checking the level of the operator.
@@ -67,6 +79,10 @@ void postfix(char* equations, int l) {
             int opr = 0;
             if (equations[j] == '+') opr = -1;
             else if (equations[j] == '-') opr = -2;
+            else if (equations[j] == '*') opr = -4;
+            else if (equations[j] == '/') opr = -5;
+            else if (equations[j] == '%') opr = -6;
+            else if (equations[j] == '^') opr = -7;
             else if (equations[j] == '(') opr = -13;
             else if (equations[j] == ')') { // Right parenthesis has special behavior.
                 opr = -14;
@@ -78,7 +94,7 @@ void postfix(char* equations, int l) {
             }
             // While there are still element(s) at same level inside the stack :
             if (opr != -14) {
-                while (((op.values[op.top] / 3 == opr / 3) || (op.values[op.top] / 3 < opr / 3)) && (op.top != -1) &&
+                while (((op.values[op.top] / 4 == opr / 4) || (op.values[op.top] / 4 < opr / 4)) && (op.top != -1) &&
                        (op.values[op.top] != -13) && (opr != -13)) {
                     queue(op.values[op.top]); // Queue it.
                     popOperator();  // Pop it from the stack.
@@ -111,10 +127,37 @@ void calculate() {
                 case -2:
                     calPush(b - a);
                     break;
+                case -4:
+                    calPush(b * a);
+                    break;
+                case -5:
+                    calPush(b / a);
+                    break;
+                case -6:
+                    calPush(fmod(b, a));
+                    break;
+                case -7:
+                    calPush(pow(b, a));
+                    break;
             }
         }
     }
     printf("%.13f", calTop() / 1.0);
+}
+
+
+// Checking if the equation is legal.
+int exception_handling(char *equations, int l) {
+    int parentheses = 0;
+    for (int i = 0; i < l; i++) {
+        if (equations[i] == '(') parentheses++;
+        else if (equations[i] == ')') {
+            if (parentheses >= 0) parentheses--;
+            else return 1;
+        }
+    }
+    if (parentheses != 0) return 1;
+    return 0;
 }
 
 
@@ -126,7 +169,7 @@ int main() {
     // int "i" is just a reusable variable.
     char equations[LT];
     char *equation_pos = &equations[0];
-    int equations_length[LT];
+    int equations_length[LT / 3];
     int length = 0, T = 0, i = 0;
 
     // Entering equations
@@ -150,16 +193,18 @@ int main() {
         q.rear = -1;
         ca.top = -1;    // Resetting the calculator stack.
 
-        postfix(equation_pos, equations_length[i]);
+        // If the equation is legal, do postfix and calculate.
+        if (exception_handling(equation_pos, equations_length[i]) != 1) {
+            postfix(equation_pos, equations_length[i]);
+//            printQueue();
+            calculate();
+            // Else, told the user this equation has some problem.
+        } else printf("The equation has unbalanced parentheses.");
+
         equation_pos += equations_length[i] + 1; // Plus one for '\n' operator.
         printf("\n");
-        i++;
 
-        printf("Postfix of equation %d : ", i+1);
-        printQueue();
-        printf("The answer is : ");
-        calculate();
-        printf("\n");
+        i++;
     }
     return 0;
 }
@@ -204,6 +249,18 @@ void printQueue(void) {
                     break;
                 case -2:
                     printf("- ");
+                    break;
+                case -4:
+                    printf("* ");
+                    break;
+                case -5:
+                    printf("/ ");
+                    break;
+                case -6:
+                    printf("%% ");
+                    break;
+                case -7:
+                    printf("^ ");
                     break;
             }
         }
