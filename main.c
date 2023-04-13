@@ -83,7 +83,7 @@ void postfix(char* equations, int l) {
             }
             // While there are still element(s) at same level inside the stack :
             if (opr != -14) {
-                while (((op.values[op.top] / 3 == opr / 3) || (op.values[op.top] / 3 < opr / 3)) && (op.top != -1) &&
+                while (((op.values[op.top] / 4 == opr / 4) || (op.values[op.top] / 4 < opr / 4)) && (op.top != -1) &&
                        (op.values[op.top] != -13) && (opr != -13)) {
                     queue(op.values[op.top]); // Queue it.
                     popOperator();  // Pop it from the stack.
