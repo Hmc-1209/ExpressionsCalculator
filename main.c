@@ -134,6 +134,10 @@ void calculate() {
                     break;
                 case -5:
                     calPush(b / a);
+                    if (a == 0) {   // Handling error if the denominator is 0 after some steps of calculating.
+                        printf("The expression can't divide a number by zero.");
+                        return;
+                    }
                     break;
                 case -6:
                     calPush(fmod(b, a));
@@ -202,7 +206,7 @@ int main() {
             case 2:
                 printf("The expression can't divide a number by zero.");
                 break;
-            // Else, do postfix and calculate the answer.
+                // Else, do postfix and calculate the answer.
             default:
                 postfix(expression_pos, expressions_length[i]);
                 calculate();
