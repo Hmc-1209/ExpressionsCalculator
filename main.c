@@ -27,21 +27,13 @@ void pushOperator(int operator);
 
 void popOperator(void);
 
-void printOperator(void);
-
-int topOperator(void);
-
 void queue(int element);
-
-void printQueue(void);
 
 void calPush(double num);
 
 void calPop(void);
 
 double calTop(void);
-
-void calPrint(void);
 
 
 // Generating stacks and queue.
@@ -232,53 +224,10 @@ void popOperator(void) {    // Popping an operator from the storage stack.
     op.top -= 1;
 }
 
-void printOperator(void) {  // Print
-    for (int i = 0; i < op.top + 1; i++) printf("%d ", op.values[i]);
-    printf("\n");
-}
-
-int topOperator(void) {
-    return op.values[op.top];
-}
-
 // --------------------- Queue functions ---------------------
 void queue(int element) {
     q.rear += 1;
     q.values[q.rear] = element;
-}
-
-void dequeue(void) {
-    q.front += 1;
-}
-
-void printQueue(void) {
-    for (int i = q.front; i < q.rear + 1; i++) {
-        if (q.values[i] >= 0) {
-            printf("%d ", q.values[i]);
-        } else {
-            switch (q.values[i]) {
-                case -1:
-                    printf("+ ");
-                    break;
-                case -2:
-                    printf("- ");
-                    break;
-                case -4:
-                    printf("* ");
-                    break;
-                case -5:
-                    printf("/ ");
-                    break;
-                case -6:
-                    printf("%% ");
-                    break;
-                case -7:
-                    printf("^ ");
-                    break;
-            }
-        }
-    }
-    printf("\n");
 }
 
 // --------------------- Calculator functions ---------------------
@@ -293,11 +242,4 @@ void calPop() {
 
 double calTop(void) {
     return ca.values[ca.top];
-}
-
-void calPrint(void) {
-    for (int i = 0; i <= ca.top; i++) {
-        printf("%.13f ", ca.values[i]);
-    }
-    printf("\n");
 }
