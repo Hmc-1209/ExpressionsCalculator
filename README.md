@@ -16,9 +16,10 @@ The calculator uses space as the end of the input, see the example given below :
 ```
 123+(456-789)
 85*5%3-120+3902
-777/40-(192-49+(12-5)*59%(6-10))-10  (<- Remember the space at the end of the input.)
+777/40-(192-49+(12-5)*59%(6-10))-10
+9563*102/(598%12)-32-10+563*2/37 (<- Remember the space at the end of the input.)
 ```
-Calculate &darr;
+Output &darr;
 ```
 -210.0000000000000
 3784.0000000000000
