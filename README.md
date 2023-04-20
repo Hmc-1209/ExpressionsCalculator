@@ -1,9 +1,26 @@
 # Expressions Calculator
 
 ## Intro
-This is a expression calculator.  
-Contributor: Danny Ho  
-Versions of the project :  
+This is an expression calculator.  
+Contributor : Danny Ho  
+### Versions of the project :  
 * Eps_1 &ensp; --> &ensp; +, - implementation
 * Eps_2 &ensp; --> &ensp; +, -, *, / implementation
-* Eps_3 &ensp; --> &ensp; +, -, *, /, ^, % implementation
+* Eps_3 &ensp; --> &ensp; +, -, *, /, ^, % implementation  
+* Eps_ExceptionHandling &ensp; --> &ensp; exceptions and beautify  
+
+All versions contain brackets computability.  
+***
+### How to use it
+The calculator uses space as the end of the input, see the example given below :  
+```
+123+(456-789)
+85*5%3-120+3902
+777/40-(192-49+(12-5)*59%(6-10))-10  (<- Remember the space at the end of the input.)
+```
+Calculate &darr;
+```
+-210.0000000000000
+3784.0000000000000
+-130.5750000000000
+```
